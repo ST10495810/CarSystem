@@ -8,17 +8,16 @@ package iierosebankcollege.carsystem;
  *
  * @author Bongumusa Maseko
  */
-import javax.swing.*; // Swing GUI library
-import javax.swing.table.DefaultTableModel; // Table model for JTable
-import java.awt.*; // For layouts
-import java.awt.event.*; // For event listeners
-import java.io.*; // For serialization
-import java.util.ArrayList; // ArrayList for in-memory storage
-import java.util.Date; // For dates
-import java.text.SimpleDateFormat; // Formatting dates
+import javax.swing.*; 
+import javax.swing.table.DefaultTableModel; 
+import java.awt.*; 
+import java.awt.event.*; 
+import java.io.*; 
+import java.util.ArrayList; 
+import java.util.Date; 
+import java.text.SimpleDateFormat;
 
 public class CarSystem extends JFrame implements Serializable{
-     // --- Data models --- (each inner class represents one type of record)
 
     // Vehicle model: holds vehicle-related fields
     static class Vehicle implements Serializable {
@@ -29,7 +28,7 @@ public class CarSystem extends JFrame implements Serializable{
         double price;                    // price for sale or rental base
         String status;                   // status: Available / Rented / Sold / Maintenance
 
-        // Constructor: initialize all fields and set default status to "Available"
+        // Constructor: set default status to "Available"
         Vehicle(int id, String make, String model, int year, String color, double price) {
             this.id = id;               // assign ID
             this.make = make;           // assign make
@@ -41,7 +40,7 @@ public class CarSystem extends JFrame implements Serializable{
         }
     }
 
-    // Customer model: holds customer details
+    // Customer model
     static class Customer implements Serializable {
         private static final long serialVersionUID = 1L; // serialization version
         int id;                 // unique customer ID
@@ -57,7 +56,7 @@ public class CarSystem extends JFrame implements Serializable{
         }
     }
 
-    // Rental model: represents a rental transaction
+    // Rental model
     static class Rental implements Serializable {
         private static final long serialVersionUID = 1L; // serialization version
         int id;                 // unique rental ID
@@ -118,28 +117,28 @@ public class CarSystem extends JFrame implements Serializable{
         }
     }
 
-    // --- In-memory stores ---: collections that act like our 'database' while the program runs
+    // memeory stores thta acts like a database
     ArrayList<Vehicle> vehicles = new ArrayList<>();      // list of vehicles
     ArrayList<Customer> customers = new ArrayList<>();    // list of customers
     ArrayList<Rental> rentals = new ArrayList<>();        // list of active rentals
     ArrayList<Sale> sales = new ArrayList<>();            // list of sales records
     ArrayList<Maintenance> maints = new ArrayList<>();    // list of maintenance records
 
-    // --- Simple ID counters ---: used to generate unique numeric IDs for each entity type
+    // ID counter
     int nextVehicleId = 1;   // next ID to assign to a new Vehicle
     int nextCustomerId = 1;  // next ID for Customer
     int nextRentalId = 1;    // next ID for Rental
     int nextSaleId = 1;      // next ID for Sale
     int nextMaintId = 1;     // next ID for Maintenance
 
-    // --- GUI components (table models used by JTable) ---
+    //GUI components
     private DefaultTableModel vehicleTableModel;   // model for vehicle table
     private DefaultTableModel customerTableModel;  // model for customer table
     private DefaultTableModel rentalTableModel;    // model for rental table
     private DefaultTableModel saleTableModel;      // model for sales table
     private DefaultTableModel maintTableModel;     // model for maintenance table
 
-    // --- Serialization filename ---: file where data will be saved/loaded
+    // Serialization filename 
     private static final String DATA_FILE = "car_system_data.ser";
 
     // Constructor: build the main window and initialize state
@@ -158,52 +157,47 @@ public class CarSystem extends JFrame implements Serializable{
     private void initGUI() {
         JTabbedPane tabs = new JTabbedPane(); // tabbed pane to hold modules
 
-        // --- Vehicles Tab ---
+        // Vehicles Tab 
         JPanel vehiclePanel = new JPanel(new BorderLayout()); // panel with BorderLayout
-        // create table model with column names for vehicles
         vehicleTableModel = new DefaultTableModel(new Object[]{"ID", "Make", "Model", "Year", "Color", "Price", "Status"}, 0);
         JTable vehicleTable = new JTable(vehicleTableModel); // create table using model
         vehiclePanel.add(new JScrollPane(vehicleTable), BorderLayout.CENTER); // add table inside a scroll pane to center
         vehiclePanel.add(vehicleControlsPanel(), BorderLayout.SOUTH); // add controls at bottom
         tabs.addTab("Vehicles", vehiclePanel); // add tab labeled "Vehicles"
 
-        // --- Customers Tab ---
-        JPanel customerPanel = new JPanel(new BorderLayout()); 
-        // customer table model with columns
+        // Customers Tab 
+        JPanel customerPanel = new JPanel(new BorderLayout());
         customerTableModel = new DefaultTableModel(new Object[]{"ID", "Name", "Phone", "Email", "Address"}, 0);
         JTable customerTable = new JTable(customerTableModel); // table to display customers
         customerPanel.add(new JScrollPane(customerTable), BorderLayout.CENTER); // center table
         customerPanel.add(customerControlsPanel(), BorderLayout.SOUTH); // controls below
         tabs.addTab("Customers", customerPanel); // add customer tab
 
-        // --- Rentals Tab ---
+        // Rentals Tab
         JPanel rentalPanel = new JPanel(new BorderLayout());
-        // rental table model with columns
         rentalTableModel = new DefaultTableModel(new Object[]{"ID", "VehicleID", "CustomerID", "RentalDate", "ReturnDate", "TotalCost"}, 0);
         JTable rentalTable = new JTable(rentalTableModel); // create rental table
         rentalPanel.add(new JScrollPane(rentalTable), BorderLayout.CENTER); // center rental table
         rentalPanel.add(rentalControlsPanel(), BorderLayout.SOUTH); // add rental controls
         tabs.addTab("Rentals", rentalPanel); // add rentals tab
 
-        // --- Sales Tab ---
+        // Sales Tab
         JPanel salesPanel = new JPanel(new BorderLayout());
-        // sales table model with columns
         saleTableModel = new DefaultTableModel(new Object[]{"ID", "VehicleID", "CustomerID", "DateSold", "SellingPrice"}, 0);
         JTable saleTable = new JTable(saleTableModel); // create sales table
         salesPanel.add(new JScrollPane(saleTable), BorderLayout.CENTER); // add scrollable table to center
         salesPanel.add(salesControlsPanel(), BorderLayout.SOUTH); // add sales controls at bottom
         tabs.addTab("Sales", salesPanel); // add sales tab
 
-        // --- Maintenance Tab ---
+        // Maintenance Tab
         JPanel maintPanel = new JPanel(new BorderLayout());
-        // maintenance table model with columns
         maintTableModel = new DefaultTableModel(new Object[]{"ID", "VehicleID", "ServiceType", "ServiceDate", "Cost", "Mechanic"}, 0);
         JTable maintTable = new JTable(maintTableModel); // table for maintenance records
         maintPanel.add(new JScrollPane(maintTable), BorderLayout.CENTER); // center table
         maintPanel.add(maintenanceControlsPanel(), BorderLayout.SOUTH); // add maintenance controls
         tabs.addTab("Maintenance", maintPanel); // add maintenance tab
 
-        // --- Top menu (save/load/clear) ---
+        // Top menu
         JPanel top = new JPanel(new FlowLayout(FlowLayout.LEFT)); // top panel with left-aligned flow layout
         JButton saveBtn = new JButton("Save Data"); // button to save data
         JButton loadBtn = new JButton("Load Data"); // button to load data from disk
@@ -212,7 +206,6 @@ public class CarSystem extends JFrame implements Serializable{
         // wire button actions to methods
         saveBtn.addActionListener(e -> saveData()); // when clicked, call saveData()
         loadBtn.addActionListener(e -> { loadData(); refreshAllTables(); }); // load then refresh tables
-        // clear: confirm with user then clear and refresh
         clearBtn.addActionListener(e -> { if (confirm("Clear ALL data?")) { clearAllData(); refreshAllTables(); } });
 
         // add buttons to top panel
@@ -226,14 +219,14 @@ public class CarSystem extends JFrame implements Serializable{
         getContentPane().add(tabs, BorderLayout.CENTER); // tabs in center
     }
 
-    // --- Panels for controls ---: each method below creates controls (input fields + buttons) for a tab
+    //Panels for controls 
 
-    // Controls panel for Vehicles: fields to add a vehicle and delete by id
+    // Controls panel for Vehicles
     private JPanel vehicleControlsPanel() {
-        JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT)); // row-based layout left-aligned
+        JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT)); 
         JTextField makeF = new JTextField(8); // text field for make
         JTextField modelF = new JTextField(8); // model field
-        JTextField yearF = new JTextField(4); // year field (small width)
+        JTextField yearF = new JTextField(4); // year field 
         JTextField colorF = new JTextField(6); // color field
         JTextField priceF = new JTextField(7); // price field
 
@@ -241,7 +234,7 @@ public class CarSystem extends JFrame implements Serializable{
         JButton delete = new JButton("Delete by ID"); // delete button
         JTextField deleteId = new JTextField(4); // field for id to delete
 
-        // Add button action: read inputs, parse numeric values and call addVehicle
+        // Add button action
         add.addActionListener(e -> {
             try {
                 String make = makeF.getText().trim(); // get make text
@@ -258,7 +251,7 @@ public class CarSystem extends JFrame implements Serializable{
             }
         });
 
-        // Delete button action: parse ID and call deleteVehicle
+        // Delete button action
         delete.addActionListener(e -> {
             try {
                 int id = Integer.parseInt(deleteId.getText().trim()); // parse id
@@ -280,7 +273,7 @@ public class CarSystem extends JFrame implements Serializable{
         return p; // return constructed panel
     }
 
-    // Controls panel for Customers: fields for adding and deleting customers
+    // Controls panel for Customers
     private JPanel customerControlsPanel() {
         JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JTextField nameF = new JTextField(10); // name field
@@ -291,7 +284,7 @@ public class CarSystem extends JFrame implements Serializable{
         JButton delete = new JButton("Delete by ID"); // delete button
         JTextField deleteId = new JTextField(4); // id field for delete
 
-        // Add customer action: read inputs and call addCustomer
+        // Add customer action
         add.addActionListener(e -> {
             try {
                 String name = nameF.getText().trim(); // get name
@@ -304,7 +297,7 @@ public class CarSystem extends JFrame implements Serializable{
             } catch (Exception ex) { showError("Invalid input"); } // generic error
         });
 
-        // Delete customer by ID action: parse ID and call deleteCustomer
+        // Delete customer by ID action
         delete.addActionListener(e -> {
             try {
                 int id = Integer.parseInt(deleteId.getText().trim()); // parse id
@@ -325,7 +318,7 @@ public class CarSystem extends JFrame implements Serializable{
         return p;
     }
 
-    // Controls panel for Rentals: create and close rentals
+    // Controls panel for Rentals
     private JPanel rentalControlsPanel() {
         JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JTextField vehicleIdF = new JTextField(4); // vehicle id input
@@ -336,7 +329,7 @@ public class CarSystem extends JFrame implements Serializable{
         JButton close = new JButton("Close Rental (by ID)"); // close rental button
         JTextField closeId = new JTextField(4); // rental id to close
 
-        // Add rental action: parse inputs, add rental if vehicle/customer exist and vehicle is available
+        // Add rental action
         add.addActionListener(e -> {
             try {
                 int vid = Integer.parseInt(vehicleIdF.getText().trim()); // vehicle id
@@ -351,7 +344,7 @@ public class CarSystem extends JFrame implements Serializable{
             } catch (Exception ex) { showError("Invalid input: " + ex.getMessage()); }
         });
 
-        // Close rental action: parse rental id and close rental, marking vehicle available again
+        // Close rental action
         close.addActionListener(e -> {
             try {
                 int id = Integer.parseInt(closeId.getText().trim()); // rental id to close
@@ -372,7 +365,7 @@ public class CarSystem extends JFrame implements Serializable{
         return p;
     }
 
-    // Controls panel for Sales: record a sale
+    // Controls panel for Sales
     private JPanel salesControlsPanel() {
         JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JTextField vehicleIdF = new JTextField(4); // vehicle id input
@@ -380,7 +373,7 @@ public class CarSystem extends JFrame implements Serializable{
         JTextField sellingPriceF = new JTextField(7); // price input
         JButton add = new JButton("Record Sale"); // record sale button
 
-        // Add sale action: parse inputs and add sale if vehicle is available and customer exists
+        // Add sale action
         add.addActionListener(e -> {
             try {
                 int vid = Integer.parseInt(vehicleIdF.getText().trim()); // vehicle id
@@ -401,7 +394,7 @@ public class CarSystem extends JFrame implements Serializable{
         return p;
     }
 
-    // Controls panel for Maintenance: add maintenance record
+    // Controls panel for Maintenance
     private JPanel maintenanceControlsPanel() {
         JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JTextField vehicleIdF = new JTextField(4); // vehicle id
@@ -411,7 +404,7 @@ public class CarSystem extends JFrame implements Serializable{
         JTextField mechF = new JTextField(8); // mechanic name
         JButton add = new JButton("Add Maintenance"); // add maintenance button
 
-        // Add maintenance action: parse inputs, add record, and set vehicle status to Maintenance
+        // Add maintenance action
         add.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -440,7 +433,7 @@ public class CarSystem extends JFrame implements Serializable{
         return p;
     }
 
-    // --- Data operations ---: methods that change the in-memory lists (CRUD-like behavior)
+    // Data operations 
 
     // Add a vehicle to the vehicles list with next numeric ID
     void addVehicle(String make, String model, int year, String color, double price) {
@@ -516,19 +509,19 @@ public class CarSystem extends JFrame implements Serializable{
         return true; // success
     }
 
-    // Helper: find vehicle by ID (linear search)
+    // Helper: find vehicle by ID 
     private Vehicle findVehicleById(int id) {
         for (Vehicle v : vehicles) if (v.id == id) return v; // return first match
         return null; // not found
     }
 
-    // Helper: find customer by ID (linear search)
+    // Helper: find customer by ID
     private Customer findCustomerById(int id) {
         for (Customer c : customers) if (c.id == id) return c; // return match
         return null; // not found
     }
 
-    // --- UI helpers ---: methods for updating UI and persisting data
+    // UI helpers
 
     // Refresh all JTable models from the in-memory lists
     private void refreshAllTables() {
@@ -538,25 +531,25 @@ public class CarSystem extends JFrame implements Serializable{
             vehicleTableModel.addRow(new Object[]{v.id, v.make, v.model, v.year, v.color, v.price, v.status}); // add row
         }
 
-        // Customers table: clear and repopulate
+        // Customers table
         customerTableModel.setRowCount(0);
         for (Customer c : customers) {
             customerTableModel.addRow(new Object[]{c.id, c.name, c.phone, c.email, c.address});
         }
 
-        // Rentals table: clear and repopulate
+        // Rentals table 
         rentalTableModel.setRowCount(0);
         for (Rental r : rentals) {
             rentalTableModel.addRow(new Object[]{r.id, r.vehicleId, r.customerId, r.rentalDate, r.returnDate, r.totalCost});
         }
 
-        // Sales table: clear and repopulate
+        // Sales table
         saleTableModel.setRowCount(0);
         for (Sale s : sales) {
             saleTableModel.addRow(new Object[]{s.id, s.vehicleId, s.customerId, s.dateSold, s.sellingPrice});
         }
 
-        // Maintenance table: clear and repopulate
+        // Maintenance table
         maintTableModel.setRowCount(0);
         for (Maintenance m : maints) {
             maintTableModel.addRow(new Object[]{m.id, m.vehicleId, m.serviceType, m.serviceDate, m.cost, m.mechanic});
@@ -624,17 +617,17 @@ public class CarSystem extends JFrame implements Serializable{
         return JOptionPane.showConfirmDialog(this, msg, "Confirm", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
     }
 
-    // Helper: show an error dialog with given message
+    // Helper: show an error dialog 
     private void showError(String msg) {
         JOptionPane.showMessageDialog(this, msg, "Error", JOptionPane.ERROR_MESSAGE);
     }
 
-    // Helper: show an information dialog with given message
+    // Helper: show an information dialOG
     private void showInfo(String msg) {
         JOptionPane.showMessageDialog(this, msg, "Info", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    // --- Main ---: application entry point. Creates and shows the GUI on the EDT
+    // Main
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             CarSystem app = new CarSystem(); // create app instance
