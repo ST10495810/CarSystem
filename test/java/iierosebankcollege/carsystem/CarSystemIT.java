@@ -135,7 +135,7 @@ public class CarSystemIT {
         system.addVehicle("Ford", "Ranger", 2020, "Grey", 400000);
         system.vehicles.get(0).status = "Rented";
 
-        system.addCustomer("Jake", "0841111111", "jake@mail.com", "Soweto");
+        system.addCustomer("Malwande", "0712324556", "jake@mail.com", "Nelspruit");
 
         boolean ok = system.addSale(1, 1, "2025-05-10", 380000);
 
@@ -163,3 +163,4 @@ public class CarSystemIT {
         assertEquals(0, system.maints.size());
     }
 }
+
